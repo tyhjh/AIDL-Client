@@ -11,16 +11,14 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.widget.Toast;
 
-import com.yorhp.interprocesscommunication.IMyAidlInterface;
 import com.yorhp.interprocesscommunication.IOnUserChangedListener;
 import com.yorhp.interprocesscommunication.bean.User;
+import com.yorhp.userlibrary.UserManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
-    private IMyAidlInterface myAidlInterface;
 
     /**
      * 服务端信使
@@ -46,23 +44,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent();
-        intent.setAction("com.yorhp.aild.name");
-        intent.setPackage("com.yorhp.interprocesscommunication");
-        bindService(intent, aidlService, BIND_AUTO_CREATE);
-
-
+        UserManager.getInstance().init(this);
         findViewById(R.id.btnAIDL).setOnClickListener(v -> {
-            if (myAidlInterface != null) {
-                try {
-                    String name = myAidlInterface.getUserById(0).getName();
-                    Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
-                    myAidlInterface.unRegisterListener(userChangedListener);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-
-            }
+            String name=UserManager.getInstance().getUser().getName();
+            Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
+            UserManager.getInstance().setOnUserChangedListener(userChangedListener);
         });
 
 
@@ -115,24 +101,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-
-    private ServiceConnection aidlService = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            try {
-                Toast.makeText(MainActivity.this, "service connected", Toast.LENGTH_SHORT).show();
-                myAidlInterface = IMyAidlInterface.Stub.asInterface(service);
-                myAidlInterface.registerListener(userChangedListener);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
 
     private IOnUserChangedListener userChangedListener=new IOnUserChangedListener.Stub(){
         @Override

@@ -1,2 +1,3 @@
 rootProject.name='AIDLClient'
 include ':app'
+include ':userlibrary'
