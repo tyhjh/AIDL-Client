@@ -21,21 +21,25 @@ android {
         }
     }
 
-    task makeAAA(type:Copy,dependsOn:build){
-        doFirst {
-            delete('./output/user-api.jar')
-        }
+    task makeJar(){
+        dependsOn(build)
         doLast {
-            println(projectDir.getPath()+"/output/user-api.jar")
+            String fileName="user-api.jar";
+            String savePath=projectDir.getPath()+"/output/";
+            moveJar(projectDir.getPath(),fileName,savePath)
+            openFileDir(savePath+fileName)
+            printFilePath(savePath+fileName)
         }
-        from ('build/intermediates/aar_main_jar/release/classes.jar')
-        into('./output/')
-        include('classes.jar')
-        rename ('classes.jar', 'user-api.jar')
     }
 
-    task testAAA(type: Exec,dependsOn: makeAAA) {
+    task showMakeJar(type: Exec,dependsOn: makeJar) {
         commandLine "open",projectDir.getPath()+"/output/"
+    }
+
+    task taskTest{
+        doLast {
+            print("file://"+projectDir.getPath()+"/output/")
+        }
     }
 
 }

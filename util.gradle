@@ -1,0 +1,67 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+ext {
+    printFilePath = this.&printFilePath
+    openFileDir = this.&openFileDir
+    moveJar = this.&moveJar
+    printLine = this.&printLine
+}
+
+/**
+ * 打印文件位置
+ * @param path
+ */
+void printFilePath(String path) {
+    printLine();
+    File file = new File(path);
+    if (!file.exists()) {
+        println("文件不存在")
+    } else {
+        println("文件输出位置 " + file.name + " -> file://" + file.getParent())
+    }
+    printLine();
+}
+
+/**
+ * 打开文件所在文件夹 mac版
+ * @param path 文件路径
+ */
+void openFileDir(String path) {
+    printLine();
+    File file = new File(path);
+    if (file.exists()) {
+        project.exec {
+            commandLine "open",file.getParent()
+        }
+        println("已打开文件所在文件夹")
+    } else {
+        println("文件不存在")
+    }
+    printLine();
+}
+
+/**
+ * 编译jar包
+ * @param fileName 文件保存名称
+ * @param path 文件保存路径
+ * @param project
+ */
+ void moveJar(String projectName,String fileName, String path) {
+     delete(path+fileName)
+     project.copy {
+         from (projectName+'/build/intermediates/aar_main_jar/release/classes.jar')
+         into(path)
+         include('classes.jar')
+         rename ('classes.jar', fileName)
+     }
+}
+
+
+/**
+ * 输出分割线
+ */
+void printLine() {
+    println("==================================================================================== ")
+}
+
+
+
